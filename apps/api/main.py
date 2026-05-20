@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from routers import clients, reports
-from database import create_tables
+from api.routers import clients, reports
+from api.database import create_tables
 import os
 
 app = FastAPI(title="AW Portal API", version="1.0.0")
