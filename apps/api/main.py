@@ -20,6 +20,10 @@ create_tables()
 app.include_router(clients.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 
+@app.get("/api/health", tags=["health"])
+def health():
+    return {"status": "ok"}
+
 # In production: serve built frontend from FastAPI
 _frontend = os.path.join(os.path.dirname(__file__), "..", "..", "apps", "web", "dist")
 if not os.path.exists(_frontend):

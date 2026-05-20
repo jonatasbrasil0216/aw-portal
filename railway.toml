@@ -3,9 +3,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "infra/Dockerfile"
 
 [deploy]
-startCommand = "/bin/sh -c \"cd /app/api && uvicorn main:app --host 0.0.0.0 --port $PORT\""
-healthcheckPath = "/docs"
-healthcheckTimeout = 100
+startCommand = "python api/seed.py && uvicorn api.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
