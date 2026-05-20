@@ -1,5 +1,5 @@
 # ── Stage 1: Build frontend ────────────────────────────────────────────────────
-FROM node:18-alpine AS frontend
+FROM node:20-alpine AS frontend
 WORKDIR /repo
 
 # Install deps (copy manifests first for layer caching)
