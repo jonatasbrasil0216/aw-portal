@@ -28,5 +28,8 @@ COPY --from=frontend /repo/apps/web/dist/ ./web/dist/
 # is launched as "api.main:app" from /app.
 ENV PYTHONPATH=/app/api
 
+# Seed demo data into the image at build time
+RUN py api/seed.py
+
 EXPOSE 8000
-CMD ["/bin/sh", "-c", "python api/seed.py && uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]
+CMD ["/bin/sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]
