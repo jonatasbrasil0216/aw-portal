@@ -23,5 +23,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY apps/api/ ./api/
 COPY --from=frontend /repo/apps/web/dist/ ./web/dist/
 
+# api/ sub-modules use bare imports (e.g. "from database import ...").
+# Adding /app/api to PYTHONPATH lets them resolve while uvicorn
+# is launched as "api.main:app" from /app.
+ENV PYTHONPATH=/app/api
+
 EXPOSE 8000
 CMD ["/bin/sh", "-c", "python api/seed.py && uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]
