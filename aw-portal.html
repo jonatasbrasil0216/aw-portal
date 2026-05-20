@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AW Client Report Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2044;
+    --navy-mid: #1a3260;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f8f5ef;
+    --white: #ffffff;
+    --green: #2d7a4f;
+    --green-light: #e8f5ee;
+    --red: #c0392b;
+    --red-light: #fdf0ee;
+    --blue-acc: #2563eb;
+    --blue-light: #eff6ff;
+    --gray-100: #f4f4f5;
+    --gray-200: #e4e4e7;
+    --gray-400: #a1a1aa;
+    --gray-600: #52525b;
+    --gray-800: #27272a;
+    --shadow-sm: 0 1px 3px rgba(15,32,68,0.08);
+    --shadow-md: 0 4px 16px rgba(15,32,68,0.10);
+    --shadow-lg: 0 12px 40px rgba(15,32,68,0.14);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--gray-800);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    background: var(--navy);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 32px;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .topnav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    letter-spacing: 0.01em;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topnav-logo span {
+    color: var(--gold);
+  }
+  .topnav-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); margin: 0 4px; }
+  .topnav-title {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .topnav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .topnav-user {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: var(--navy);
+  }
+
+  /* ── LAYOUT ── */
+  .shell { display: flex; flex: 1; }
+
+  .sidebar {
+    width: 240px;
+    background: var(--white);
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    min-height: calc(100vh - 60px);
+  }
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    padding: 0 20px;
+    margin-bottom: 8px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: var(--gray-600);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .sidebar-item:hover { background: var(--gray-100); color: var(--navy); }
+  .sidebar-item.active { background: var(--blue-light); color: var(--blue-acc); border-left-color: var(--blue-acc); font-weight: 500; }
+  .sidebar-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .main { flex: 1; padding: 32px; overflow-y: auto; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .page-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--navy); line-height: 1.2; }
+  .page-subtitle { font-size: 14px; color: var(--gray-400); margin-top: 4px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--navy); color: var(--white); }
+  .btn-primary:hover { background: var(--navy-mid); }
+  .btn-gold { background: var(--gold); color: var(--navy); }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-outline { background: var(--white); color: var(--gray-600); border: 1px solid var(--gray-200); }
+  .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+  .btn-green { background: var(--green); color: var(--white); }
+  .btn-green:hover { background: #1e5c39; }
+  .btn-danger { background: var(--red); color: var(--white); }
+
+  /* ── CLIENT CARDS ── */
+  .clients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .client-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    cursor: pointer;
+    transition: all 0.18s;
+    position: relative;
+    overflow: hidden;
+  }
+  .client-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--navy); }
+  .client-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--navy), var(--gold));
+  }
+  .client-initials {
+    width: 48px; height: 48px;
+    background: var(--navy);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-family: 'DM Serif Display', serif; font-size: 18px;
+    margin-bottom: 14px;
+  }
+  .client-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--navy); margin-bottom: 4px; }
+  .client-meta { font-size: 13px; color: var(--gray-400); margin-bottom: 14px; }
+  .client-stats { display: flex; gap: 16px; }
+  .client-stat { font-size: 12px; color: var(--gray-600); }
+  .client-stat strong { display: block; font-size: 14px; color: var(--gray-800); font-weight: 600; }
+  .client-actions { margin-top: 16px; display: flex; gap: 8px; }
+
+  .add-client-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 2px dashed var(--gray-200);
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 180px;
+    transition: all 0.18s;
+    color: var(--gray-400);
+    text-align: center;
+    gap: 10px;
+  }
+  .add-client-card:hover { border-color: var(--navy); color: var(--navy); background: var(--blue-light); }
+  .add-client-icon { font-size: 32px; }
+  .add-client-label { font-size: 15px; font-weight: 500; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 99px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-gold { background: #fef3c7; color: #92400e; }
+  .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+
+  /* ── PROFILE SCREEN ── */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--gray-400); cursor: pointer;
+    margin-bottom: 20px; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--navy); }
+
+  .profile-header {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .profile-avatar {
+    width: 72px; height: 72px;
+    background: var(--navy);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-family: 'DM Serif Display', serif; font-size: 28px;
+    flex-shrink: 0;
+  }
+  .profile-info { flex: 1; }
+  .profile-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--navy); }
+  .profile-detail { font-size: 14px; color: var(--gray-400); margin-top: 4px; }
+  .profile-tags { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+  }
+  .tab {
+    padding: 10px 20px;
+    font-size: 14px; font-weight: 500;
+    color: var(--gray-400);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--navy); }
+  .tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+  /* ── FORM ELEMENTS ── */
+  .form-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 20px;
+  }
+  .form-section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px; color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--gray-600); letter-spacing: 0.04em; text-transform: uppercase; }
+  .form-input {
+    padding: 9px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    color: var(--gray-800);
+    transition: all 0.15s;
+    background: var(--white);
+  }
+  .form-input:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(15,32,68,0.08); }
+  .form-input.prefilled { background: var(--gray-100); color: var(--gray-600); }
+  .form-input.needs-entry { border-color: var(--gold); background: #fffbf0; }
+  .form-input.needs-entry:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
+  .form-hint { font-size: 11px; color: var(--gray-400); }
+
+  /* ── DATA ENTRY SCREEN ── */
+  .entry-progress {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .progress-bar { flex: 1; height: 6px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--gold)); border-radius: 99px; transition: width 0.4s; }
+  .progress-label { font-size: 13px; color: var(--gray-600); white-space: nowrap; }
+
+  .calc-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+    font-size: 14px;
+  }
+  .calc-row:last-child { border-bottom: none; }
+  .calc-label { color: var(--gray-600); }
+  .calc-value { font-weight: 600; color: var(--navy); font-size: 15px; }
+  .calc-value.positive { color: var(--green); }
+  .calc-value.negative { color: var(--red); }
+  .calc-divider { border: none; border-top: 2px solid var(--navy); margin: 8px 0; }
+
+  /* ── REPORT PREVIEW ── */
+  .report-preview-container {
+    background: var(--gray-800);
+    border-radius: var(--radius);
+    padding: 32px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .report-page {
+    background: var(--white);
+    width: 520px;
+    min-height: 680px;
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .report-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 20px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .report-header-logo { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); }
+  .report-header-logo span { color: var(--gold); }
+  .report-header-title { font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 0.1em; text-transform: uppercase; }
+  .report-header-client { font-family: 'DM Serif Display', serif; font-size: 14px; }
+  .report-header-date { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+  /* SACS Diagram */
+  .sacs-body { padding: 28px 32px; }
+  .sacs-title {
+    font-family: 'DM Serif Display', serif; font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gray-400); margin-bottom: 24px; text-align: center;
+  }
+  .sacs-diagram {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    padding: 8px 0 24px;
+  }
+  .bubble {
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    position: relative;
+  }
+  .bubble-inflow {
+    width: 150px; height: 150px;
+    background: var(--green);
+    color: var(--white);
+  }
+  .bubble-outflow {
+    width: 130px; height: 130px;
+    background: var(--red);
+    color: var(--white);
+  }
+  .bubble-reserve {
+    width: 140px; height: 140px;
+    background: var(--navy);
+    color: var(--white);
+  }
+  .bubble-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; margin-bottom: 3px; }
+  .bubble-amount { font-family: 'DM Serif Display', serif; font-size: 19px; font-weight: 700; }
+  .bubble-sub { font-size: 9px; opacity: 0.75; margin-top: 2px; }
+  .sacs-arrow {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0; margin: 2px 0;
+  }
+  .sacs-arrow-line { width: 2px; height: 28px; }
+  .sacs-arrow-line.green { background: var(--green); }
+  .sacs-arrow-line.red { background: var(--red); }
+  .sacs-arrow-line.navy { background: var(--navy); }
+  .sacs-arrow-tip { font-size: 16px; }
+  .sacs-arrow-label {
+    font-size: 10px; color: var(--gray-400);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--white); padding: 1px 6px; margin-top: -2px;
+  }
+
+  .sacs-row2 { display: flex; align-items: center; gap: 20px; margin-top: 4px; }
+  .sacs-h-arrow {
+    display: flex; align-items: center;
+    gap: 0;
+  }
+  .sacs-h-line { height: 2px; width: 32px; background: var(--navy); }
+
+  .sacs-summary {
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-top: 20px;
+  }
+  .sacs-summary-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 10px; }
+
+  /* TCC Diagram */
+  .tcc-body { padding: 20px 28px; }
+  .tcc-title {
+    font-family: 'DM Serif Display', serif; font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gray-400); margin-bottom: 16px; text-align: center;
+  }
+  .tcc-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 12px;
+    align-items: start;
+  }
+  .tcc-section-label {
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gray-400); margin-bottom: 6px; font-weight: 600;
+  }
+  .acct-bubble {
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .acct-bubble .acct-type { font-size: 9px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.06em; }
+  .acct-bubble .acct-balance { font-family: 'DM Serif Display', serif; font-size: 15px; margin-top: 2px; }
+  .acct-bubble .acct-num { font-size: 9px; opacity: 0.55; margin-top: 1px; }
+
+  .total-box {
+    background: var(--gray-800);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 4px;
+  }
+  .total-box .total-label { font-size: 9px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.06em; }
+  .total-box .total-amount { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--gold); margin-top: 2px; }
+
+  .tcc-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .tcc-center-bubble {
+    width: 100px; height: 100px;
+    background: var(--navy-mid);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    color: var(--white);
+    border: 3px solid var(--gold);
+    margin-bottom: 8px;
+  }
+  .tcc-center-bubble .acct-type { font-size: 8px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.06em; }
+  .tcc-center-bubble .acct-balance { font-family: 'DM Serif Display', serif; font-size: 13px; margin-top: 2px; }
+
+  .tcc-liabilities {
+    grid-column: 1 / -1;
+    background: var(--red-light);
+    border-radius: 8px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--red);
+  }
+  .liability-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; }
+  .liability-label { color: var(--gray-600); }
+  .liability-amount { font-weight: 600; color: var(--red); }
+
+  .grand-total-bar {
+    grid-column: 1 / -1;
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .grand-total-bar .label { font-size: 11px; opacity: 0.7; letter-spacing: 0.06em; text-transform: uppercase; }
+  .grand-total-bar .amount { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--gold); }
+
+  /* ── REPORT HISTORY ── */
+  .history-table { width: 100%; border-collapse: collapse; }
+  .history-table th { font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+  .history-table td { padding: 12px; border-bottom: 1px solid var(--gray-100); font-size: 14px; color: var(--gray-700); }
+  .history-table tr:hover td { background: var(--gray-100); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px;
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    box-shadow: var(--shadow-lg);
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; transform: translateY(12px);
+    transition: all 0.25s;
+    z-index: 200;
+    max-width: 340px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-icon { font-size: 18px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 150;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 560px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+  /* ── MISC ── */
+  .divider { border: none; border-top: 1px solid var(--gray-200); margin: 20px 0; }
+  .text-muted { color: var(--gray-400); font-size: 13px; }
+  .text-center { text-align: center; }
+  .mt-4 { margin-top: 16px; }
+  .mt-8 { margin-top: 32px; }
+  .flex { display: flex; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .items-center { align-items: center; }
+  .ml-auto { margin-left: auto; }
+
+  /* ── PRINT / PDF ── */
+  @media print {
+    .topnav, .sidebar, .main > *:not(.print-target) { display: none !important; }
+    .print-target { display: block !important; }
+    body { background: white; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+  .screen.active { animation: fadeIn 0.25s ease; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 48px; color: var(--gray-400); }
+  .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state-title { font-size: 18px; color: var(--gray-600); font-weight: 500; margin-bottom: 6px; }
+  .empty-state-desc { font-size: 14px; }
+
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-logo">
+    <span>W</span>indbrook
+  </div>
+  <div class="topnav-divider"></div>
+  <div class="topnav-title">Client Report Portal</div>
+  <div class="topnav-right">
+    <div class="topnav-user">
+      <span>Rebecca M.</span>
+      <div class="avatar">R</div>
+    </div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div style="margin-bottom:20px;">
+      <div class="sidebar-section-label">Navigation</div>
+      <div class="sidebar-item active" onclick="showScreen('clients')">
+        <span class="sidebar-icon">👥</span> Clients
+      </div>
+      <div class="sidebar-item" onclick="showScreen('reports')">
+        <span class="sidebar-icon">📄</span> Report History
+      </div>
+    </div>
+    <div style="margin-top:auto; padding:20px; border-top:1px solid var(--gray-200);">
+      <div class="text-muted" style="font-size:12px;">Q2 2026 · 6 active clients</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ═══════════ SCREEN: CLIENTS ═══════════ -->
+    <div id="screen-clients" class="screen active">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Clients</div>
+          <div class="page-subtitle">Manage client profiles and generate quarterly reports</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAddClientModal()">＋ Add Client</button>
+      </div>
+      <div class="clients-grid" id="clients-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- ═══════════ SCREEN: CLIENT PROFILE ═══════════ -->
+    <div id="screen-profile" class="screen">
+      <div class="back-link" onclick="showScreen('clients')">← Back to Clients</div>
+
+      <div class="profile-header" id="profile-header">
+        <!-- populated by JS -->
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('profile-info')">Profile</div>
+        <div class="tab" onclick="switchTab('profile-accounts')">Accounts</div>
+        <div class="tab" onclick="switchTab('profile-reports')">Reports</div>
+      </div>
+
+      <div id="profile-info" class="tab-content">
+        <div class="form-section">
+          <div class="form-section-title">📋 Client Information</div>
+          <div class="form-grid" id="profile-info-grid"></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">💼 Financial Parameters</div>
+          <div class="form-grid" id="profile-financial-grid"></div>
+        </div>
+      </div>
+
+      <div id="profile-accounts" class="tab-content" style="display:none;">
+        <div id="profile-accounts-content"></div>
+      </div>
+
+      <div id="profile-reports" class="tab-content" style="display:none;">
+        <div class="form-section">
+          <div class="form-section-title">📊 Report History</div>
+          <div id="profile-reports-table"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ SCREEN: DATA ENTRY ═══════════ -->
+    <div id="screen-entry" class="screen">
+      <div class="back-link" onclick="showScreen('profile')">← Back to Profile</div>
+      <div class="page-header">
+        <div>
+          <div class="page-title" id="entry-title">Generate Report</div>
+          <div class="page-subtitle">Enter current balances — all math is calculated automatically</div>
+        </div>
+        <button class="btn btn-green" onclick="generateReports()">⚡ Generate PDFs</button>
+      </div>
+
+      <div class="entry-progress">
+        <div class="progress-bar"><div class="progress-fill" id="entry-progress-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="entry-progress-label">0 of 0 fields entered</div>
+      </div>
+
+      <div class="flex gap-12" style="align-items:flex-start; flex-wrap:wrap;">
+
+        <!-- LEFT: DATA ENTRY FORMS -->
+        <div style="flex:1; min-width:320px;">
+          <!-- SACS Entry -->
+          <div class="form-section">
+            <div class="form-section-title">💰 SACS — Cash Flow</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Monthly Inflow (After-Tax)</label>
+                <input type="text" class="form-input prefilled" id="e-inflow" readonly>
+                <span class="form-hint">Pre-filled from client profile</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Monthly Outflow / Expense Budget</label>
+                <input type="text" class="form-input prefilled" id="e-outflow" readonly>
+                <span class="form-hint">Pre-filled from client profile</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Private Reserve Balance <span style="color:var(--gold)">●</span></label>
+                <input type="number" class="form-input needs-entry" id="e-reserve" placeholder="Enter current balance" oninput="recalc()">
+                <span class="form-hint">From Pinnacle Bank secure email</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Schwab Investment Balance <span style="color:var(--gold)">●</span></label>
+                <input type="number" class="form-input needs-entry" id="e-schwab" placeholder="Enter current balance" oninput="recalc()">
+                <span class="form-hint">From Charles Schwab (Rebecca)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TCC Entry -->
+          <div class="form-section">
+            <div class="form-section-title">🏦 TCC — Account Balances</div>
+            <div id="tcc-entry-fields">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: LIVE CALCULATIONS -->
+        <div style="width:280px; flex-shrink:0;">
+          <div class="form-section" style="position:sticky; top:24px;">
+            <div class="form-section-title">⚡ Live Calculations</div>
+
+            <div style="margin-bottom:16px;">
+              <div class="text-muted" style="margin-bottom:8px; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;">SACS Summary</div>
+              <div class="calc-row">
+                <span class="calc-label">Inflow</span>
+                <span class="calc-value positive" id="calc-inflow">—</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Outflow</span>
+                <span class="calc-value negative" id="calc-outflow">—</span>
+              </div>
+              <hr class="calc-divider">
+              <div class="calc-row">
+                <span class="calc-label" style="font-weight:600;">Monthly Excess</span>
+                <span class="calc-value" id="calc-excess">—</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Reserve Target</span>
+                <span class="calc-value" id="calc-target">—</span>
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+
+            <div>
+              <div class="text-muted" style="margin-bottom:8px; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;">TCC Summary</div>
+              <div class="calc-row">
+                <span class="calc-label">Client 1 Retirement</span>
+                <span class="calc-value" id="calc-ret1">—</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Client 2 Retirement</span>
+                <span class="calc-value" id="calc-ret2">—</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Non-Retirement</span>
+                <span class="calc-value" id="calc-nonret">—</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Trust / Property</span>
+                <span class="calc-value" id="calc-trust">—</span>
+              </div>
+              <hr class="calc-divider">
+              <div class="calc-row">
+                <span class="calc-label" style="font-weight:600;">Grand Total</span>
+                <span class="calc-value" id="calc-grand" style="font-size:17px; color:var(--navy)">—</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label" style="color:var(--red);">Liabilities (separate)</span>
+                <span class="calc-value negative" id="calc-liab">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ SCREEN: REPORT PREVIEW ═══════════ -->
+    <div id="screen-report" class="screen">
+      <div class="back-link" onclick="showScreen('entry')">← Back to Data Entry</div>
+      <div class="page-header">
+        <div>
+          <div class="page-title">Reports Ready</div>
+          <div class="page-subtitle" id="report-subtitle">Q2 2026</div>
+        </div>
+        <div class="flex gap-8">
+          <button class="btn btn-outline" onclick="printReport('sacs')">🖨 Print SACS PDF</button>
+          <button class="btn btn-outline" onclick="printReport('tcc')">🖨 Print TCC PDF</button>
+          <button class="btn btn-gold" onclick="downloadBoth()">⬇ Download Both</button>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="viewReport('sacs')">View SACS</button>
+        <button class="btn btn-outline" onclick="viewReport('tcc')">View TCC</button>
+      </div>
+
+      <div id="report-display"></div>
+    </div>
+
+    <!-- ═══════════ SCREEN: REPORT HISTORY ═══════════ -->
+    <div id="screen-reports" class="screen">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Report History</div>
+          <div class="page-subtitle">All generated reports across all clients</div>
+        </div>
+      </div>
+      <div class="form-section">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Client</th><th>Report Type</th><th>Quarter</th><th>Generated</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD CLIENT MODAL -->
+<div class="modal-overlay" id="add-client-modal">
+  <div class="modal">
+    <div class="modal-title">Add New Client</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Client 1 First Name</label>
+        <input type="text" class="form-input" id="new-c1-first" placeholder="e.g. James">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client 1 Last Name</label>
+        <input type="text" class="form-input" id="new-c1-last" placeholder="e.g. Anderson">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client 2 First Name (if married)</label>
+        <input type="text" class="form-input" id="new-c2-first" placeholder="Optional">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client 2 Last Name</label>
+        <input type="text" class="form-input" id="new-c2-last" placeholder="Optional">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Inflow (after tax)</label>
+        <input type="number" class="form-input" id="new-inflow" placeholder="e.g. 15000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Expense Budget</label>
+        <input type="number" class="form-input" id="new-outflow" placeholder="e.g. 11000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client 1 SSN (last 4)</label>
+        <input type="text" class="form-input" id="new-c1-ssn" maxlength="4" placeholder="XXXX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client 2 SSN (last 4)</label>
+        <input type="text" class="form-input" id="new-c2-ssn" maxlength="4" placeholder="XXXX">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✅</span>
+  <span id="toast-msg">Done</span>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────
+//  DATA STORE
+// ─────────────────────────────────────────────────────────────────────
+let currentClientId = null;
+let currentReport = null;
+let activeTab = 'profile-info';
+let currentReportView = 'sacs';
+
+const reportHistory = [
+  { client: 'Anderson Family', type: 'SACS + TCC', quarter: 'Q1 2026', date: 'Mar 15, 2026' },
+  { client: 'Chen Family',     type: 'SACS + TCC', quarter: 'Q1 2026', date: 'Mar 16, 2026' },
+  { client: 'Morrison Family', type: 'SACS + TCC', quarter: 'Q1 2026', date: 'Mar 17, 2026' },
+];
+
+const clients = [
+  {
+    id: 1,
+    c1: { first: 'James', last: 'Anderson', dob: '1962-04-15', ssn: '4821' },
+    c2: { first: 'Patricia', last: 'Anderson', dob: '1964-09-02', ssn: '3377' },
+    inflow: 15000,
+    outflow: 11000,
+    reserveTarget: 6,
+    lastReport: 'Mar 2026',
+    accounts: {
+      retirement_c1: [
+        { type: 'IRA', num: '7731', balance: null },
+        { type: 'Roth IRA', num: '2984', balance: null },
+      ],
+      retirement_c2: [
+        { type: 'IRA', num: '5512', balance: null },
+      ],
+      nonRetirement: [
+        { type: 'Joint Brokerage', num: '8823', balance: null },
+      ],
+      trust: { address: '412 Maple Drive, Atlanta GA', balance: null },
+      liabilities: [
+        { type: 'Mortgage', rate: '3.5%', balance: null },
+        { type: 'Auto Loan', rate: '6.2%', balance: null },
+      ],
+    }
+  },
+  {
+    id: 2,
+    c1: { first: 'Robert', last: 'Chen', dob: '1958-11-28', ssn: '6643' },
+    c2: { first: 'Linda', last: 'Chen', dob: '1960-03-14', ssn: '9902' },
+    inflow: 22000,
+    outflow: 14000,
+    reserveTarget: 6,
+    lastReport: 'Mar 2026',
+    accounts: {
+      retirement_c1: [
+        { type: '401K', num: '1134', balance: null },
+        { type: 'IRA', num: '8871', balance: null },
+        { type: 'Roth IRA', num: '2211', balance: null },
+      ],
+      retirement_c2: [
+        { type: 'IRA', num: '4456', balance: null },
+        { type: 'Roth IRA', num: '7723', balance: null },
+      ],
+      nonRetirement: [
+        { type: 'Joint Brokerage', num: '3312', balance: null },
+        { type: 'Individual Brokerage', num: '5589', balance: null },
+      ],
+      trust: { address: '88 Peachtree Circle, Atlanta GA', balance: null },
+      liabilities: [
+        { type: 'Mortgage', rate: '3.1%', balance: null },
+      ],
+    }
+  },
+  {
+    id: 3,
+    c1: { first: 'Margaret', last: 'Morrison', dob: '1970-07-07', ssn: '1122' },
+    c2: null,
+    inflow: 18500,
+    outflow: 10500,
+    reserveTarget: 6,
+    lastReport: 'Mar 2026',
+    accounts: {
+      retirement_c1: [
+        { type: 'IRA', num: '3341', balance: null },
+        { type: 'Roth IRA', num: '7756', balance: null },
+        { type: 'Pension', num: 'N/A', balance: null },
+      ],
+      retirement_c2: [],
+      nonRetirement: [
+        { type: 'Individual Brokerage', num: '2298', balance: null },
+      ],
+      trust: { address: '24 Willow Lane, Alpharetta GA', balance: null },
+      liabilities: [
+        { type: 'Mortgage', rate: '4.0%', balance: null },
+        { type: 'Auto Loan', rate: '5.5%', balance: null },
+        { type: 'HELOC', rate: '7.2%', balance: null },
+      ],
+    }
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────
+//  NAVIGATION
+// ─────────────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+
+  // Update sidebar
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  if (name === 'clients') document.querySelectorAll('.sidebar-item')[0].classList.add('active');
+  if (name === 'reports') document.querySelectorAll('.sidebar-item')[1].classList.add('active');
+
+  if (name === 'clients') renderClients();
+  if (name === 'reports') renderHistory();
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).style.display = 'block';
+  activeTab = tabId;
+
+  const idx = ['profile-info','profile-accounts','profile-reports'].indexOf(tabId);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  CLIENTS SCREEN
+// ─────────────────────────────────────────────────────────────────────
+function renderClients() {
+  const grid = document.getElementById('clients-grid');
+  grid.innerHTML = clients.map(c => {
+    const name = c.c2 ? `${c.c1.first} & ${c.c2.first} ${c.c1.last}` : `${c.c1.first} ${c.c1.last}`;
+    const initials = c.c2 ? c.c1.first[0] + c.c2.first[0] : c.c1.first[0] + c.c1.last[0];
+    const acctCount = c.accounts.retirement_c1.length + c.accounts.retirement_c2.length + c.accounts.nonRetirement.length;
+    return `
+      <div class="client-card" onclick="openClient(${c.id})">
+        <div class="client-initials">${initials}</div>
+        <div class="client-name">${name}</div>
+        <div class="client-meta">${c.c2 ? 'Married couple' : 'Individual'} · Last report: ${c.lastReport}</div>
+        <div class="client-stats">
+          <div class="client-stat"><strong>${fmt(c.inflow)}</strong>Monthly Inflow</div>
+          <div class="client-stat"><strong>${acctCount}</strong>Accounts</div>
+        </div>
+        <div class="client-actions">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); startEntry(${c.id})">⚡ Generate Report</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); openClient(${c.id})">View Profile</button>
+        </div>
+      </div>
+    `;
+  }).join('') + `
+    <div class="add-client-card" onclick="openAddClientModal()">
+      <div class="add-client-icon">＋</div>
+      <div class="add-client-label">Add New Client</div>
+      <div class="text-muted">Set up a new client profile</div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  CLIENT PROFILE
+// ─────────────────────────────────────────────────────────────────────
+function openClient(id) {
+  currentClientId = id;
+  const c = clients.find(x => x.id === id);
+  const name = c.c2 ? `${c.c1.first} & ${c.c2.first} ${c.c1.last}` : `${c.c1.first} ${c.c1.last}`;
+  const initials = c.c2 ? c.c1.first[0] + c.c2.first[0] : c.c1.first[0] + c.c1.last[0];
+
+  document.getElementById('profile-header').innerHTML = `
+    <div class="profile-avatar">${initials}</div>
+    <div class="profile-info">
+      <div class="profile-name">${name} Family</div>
+      <div class="profile-detail">${c.c2 ? 'Married couple · ' : 'Individual · '}Last report: ${c.lastReport}</div>
+      <div class="profile-tags">
+        <span class="badge badge-green">Active</span>
+        <span class="badge badge-gold">Retainer</span>
+        ${c.c2 ? '<span class="badge badge-gray">Joint Accounts</span>' : ''}
+      </div>
+    </div>
+    <div class="ml-auto">
+      <button class="btn btn-primary" onclick="startEntry(${id})">⚡ Generate Report</button>
+    </div>
+  `;
+
+  // Info grid
+  const infoFields = [
+    ['Client 1 Name', `${c.c1.first} ${c.c1.last}`],
+    ['Client 1 DOB', formatDate(c.c1.dob)],
+    ['Client 1 SSN (last 4)', `***${c.c1.ssn}`],
+    ...(c.c2 ? [
+      ['Client 2 Name', `${c.c2.first} ${c.c2.last}`],
+      ['Client 2 DOB', formatDate(c.c2.dob)],
+      ['Client 2 SSN (last 4)', `***${c.c2.ssn}`],
+    ] : []),
+  ];
+  document.getElementById('profile-info-grid').innerHTML = infoFields.map(([label, val]) => `
+    <div class="form-group">
+      <label class="form-label">${label}</label>
+      <input type="text" class="form-input prefilled" value="${val}" readonly>
+    </div>
+  `).join('');
+
+  // Financial grid
+  const finFields = [
+    ['Monthly Inflow (after tax)', fmt(c.inflow)],
+    ['Monthly Expense Budget', fmt(c.outflow)],
+    ['Reserve Target (months)', c.reserveTarget + 'x expenses'],
+    ['Private Reserve Target', fmt(c.outflow * c.reserveTarget)],
+  ];
+  document.getElementById('profile-financial-grid').innerHTML = finFields.map(([label, val]) => `
+    <div class="form-group">
+      <label class="form-label">${label}</label>
+      <input type="text" class="form-input prefilled" value="${val}" readonly>
+    </div>
+  `).join('');
+
+  // Accounts tab
+  const accts = c.accounts;
+  document.getElementById('profile-accounts-content').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title">🏦 ${c.c1.first}'s Retirement Accounts</div>
+      <div class="form-grid">${accts.retirement_c1.map(a => `
+        <div class="form-group">
+          <label class="form-label">${a.type} ···${a.num}</label>
+          <input type="text" class="form-input prefilled" value="Balance entered each quarter" readonly>
+        </div>
+      `).join('')}</div>
+    </div>
+    ${c.c2 && accts.retirement_c2.length ? `
+    <div class="form-section">
+      <div class="form-section-title">🏦 ${c.c2.first}'s Retirement Accounts</div>
+      <div class="form-grid">${accts.retirement_c2.map(a => `
+        <div class="form-group">
+          <label class="form-label">${a.type} ···${a.num}</label>
+          <input type="text" class="form-input prefilled" value="Balance entered each quarter" readonly>
+        </div>
+      `).join('')}</div>
+    </div>` : ''}
+    <div class="form-section">
+      <div class="form-section-title">📈 Non-Retirement Accounts</div>
+      <div class="form-grid">${accts.nonRetirement.map(a => `
+        <div class="form-group">
+          <label class="form-label">${a.type} ···${a.num}</label>
+          <input type="text" class="form-input prefilled" value="Balance entered each quarter" readonly>
+        </div>
+      `).join('')}</div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">🏠 Trust / Property</div>
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Property Address</label>
+          <input type="text" class="form-input prefilled" value="${accts.trust.address}" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Zillow Zestimate</label>
+          <input type="text" class="form-input prefilled" value="Entered each quarter from Zillow" readonly>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">📉 Liabilities</div>
+      <div class="form-grid">${accts.liabilities.map(l => `
+        <div class="form-group">
+          <label class="form-label">${l.type} @ ${l.rate}</label>
+          <input type="text" class="form-input prefilled" value="Balance entered each quarter" readonly>
+        </div>
+      `).join('')}</div>
+    </div>
+  `;
+
+  // Reports tab
+  const clientHistory = reportHistory.filter(r => r.client.includes(c.c1.last));
+  document.getElementById('profile-reports-table').innerHTML = clientHistory.length ? `
+    <table class="history-table">
+      <thead><tr><th>Report Type</th><th>Quarter</th><th>Generated</th><th>Actions</th></tr></thead>
+      <tbody>${clientHistory.map(r => `
+        <tr>
+          <td>${r.type}</td>
+          <td>${r.quarter}</td>
+          <td>${r.date}</td>
+          <td><button class="btn btn-outline btn-sm">⬇ Download</button></td>
+        </tr>
+      `).join('')}</tbody>
+    </table>
+  ` : '<div class="text-muted" style="padding:16px;">No reports generated yet.</div>';
+
+  // Reset to first tab
+  switchTab('profile-info');
+  showScreen('profile');
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  DATA ENTRY
+// ─────────────────────────────────────────────────────────────────────
+function startEntry(id) {
+  currentClientId = id;
+  const c = clients.find(x => x.id === id);
+  const name = c.c2 ? `${c.c1.first} & ${c.c2.first} ${c.c1.last}` : `${c.c1.first} ${c.c1.last}`;
+
+  document.getElementById('entry-title').textContent = `Generate Report — ${name}`;
+  document.getElementById('e-inflow').value = fmt(c.inflow);
+  document.getElementById('e-outflow').value = fmt(c.outflow);
+  document.getElementById('e-reserve').value = '';
+  document.getElementById('e-schwab').value = '';
+
+  // Build TCC entry fields
+  let html = '';
+
+  if (c.accounts.retirement_c1.length) {
+    html += `<div style="margin-bottom:12px;"><div class="form-section-title" style="font-size:13px; padding-bottom:8px; margin-bottom:10px;">👤 ${c.c1.first}'s Retirement</div><div class="form-grid">`;
+    c.accounts.retirement_c1.forEach((a, i) => {
+      html += `<div class="form-group">
+        <label class="form-label">${a.type} ···${a.num} <span style="color:var(--gold)">●</span></label>
+        <input type="number" class="form-input needs-entry" id="ret1-${i}" placeholder="Current balance" oninput="recalc()">
+        <span class="form-hint">From ${a.type.includes('401') ? 'Schwab' : 'Schwab statement'}</span>
+      </div>`;
+    });
+    html += '</div></div>';
+  }
+
+  if (c.c2 && c.accounts.retirement_c2.length) {
+    html += `<div style="margin-bottom:12px;"><div class="form-section-title" style="font-size:13px; padding-bottom:8px; margin-bottom:10px;">👤 ${c.c2.first}'s Retirement</div><div class="form-grid">`;
+    c.accounts.retirement_c2.forEach((a, i) => {
+      html += `<div class="form-group">
+        <label class="form-label">${a.type} ···${a.num} <span style="color:var(--gold)">●</span></label>
+        <input type="number" class="form-input needs-entry" id="ret2-${i}" placeholder="Current balance" oninput="recalc()">
+        <span class="form-hint">From Schwab statement</span>
+      </div>`;
+    });
+    html += '</div></div>';
+  }
+
+  html += `<div style="margin-bottom:12px;"><div class="form-section-title" style="font-size:13px; padding-bottom:8px; margin-bottom:10px;">📈 Non-Retirement</div><div class="form-grid">`;
+  c.accounts.nonRetirement.forEach((a, i) => {
+    html += `<div class="form-group">
+      <label class="form-label">${a.type} ···${a.num} <span style="color:var(--gold)">●</span></label>
+      <input type="number" class="form-input needs-entry" id="nonret-${i}" placeholder="Current balance" oninput="recalc()">
+    </div>`;
+  });
+  html += '</div></div>';
+
+  html += `<div style="margin-bottom:12px;"><div class="form-section-title" style="font-size:13px; padding-bottom:8px; margin-bottom:10px;">🏠 Trust / Zillow</div><div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">Zillow Zestimate <span style="color:var(--gold)">●</span></label>
+      <input type="number" class="form-input needs-entry" id="trust-val" placeholder="Home value from Zillow" oninput="recalc()">
+      <span class="form-hint">${c.accounts.trust.address}</span>
+    </div>
+  </div></div>`;
+
+  html += `<div><div class="form-section-title" style="font-size:13px; padding-bottom:8px; margin-bottom:10px;">📉 Liabilities</div><div class="form-grid">`;
+  c.accounts.liabilities.forEach((l, i) => {
+    html += `<div class="form-group">
+      <label class="form-label">${l.type} @ ${l.rate} <span style="color:var(--gold)">●</span></label>
+      <input type="number" class="form-input needs-entry" id="liab-${i}" placeholder="Current balance" oninput="recalc()">
+    </div>`;
+  });
+  html += '</div></div>';
+
+  document.getElementById('tcc-entry-fields').innerHTML = html;
+
+  // Pre-fill with demo data for UX
+  prefillDemoData(c);
+  recalc();
+
+  showScreen('entry');
+}
+
+function prefillDemoData(c) {
+  // Fill demo values so reviewers see live calculations
+  const demos = { 1: { ret1:[11200,15800], ret2:[28400], nonret:[52000], trust:478000, liab:[198000,14200], reserve:68000, schwab:52000 },
+                  2: { ret1:[145000,38000,22000], ret2:[67000,18000], nonret:[88000,35000], trust:620000, liab:[310000], reserve:112000, schwab:88000 },
+                  3: { ret1:[92000,44000,180000], ret2:[], nonret:[63000], trust:395000, liab:[175000,18500,42000], reserve:78000, schwab:63000 } };
+  const d = demos[c.id];
+  if (!d) return;
+  d.ret1.forEach((v,i) => { const el = document.getElementById(`ret1-${i}`); if(el) el.value=v; });
+  d.ret2.forEach((v,i) => { const el = document.getElementById(`ret2-${i}`); if(el) el.value=v; });
+  d.nonret.forEach((v,i) => { const el = document.getElementById(`nonret-${i}`); if(el) el.value=v; });
+  if(document.getElementById('trust-val')) document.getElementById('trust-val').value = d.trust;
+  d.liab.forEach((v,i) => { const el = document.getElementById(`liab-${i}`); if(el) el.value=v; });
+  document.getElementById('e-reserve').value = d.reserve;
+  document.getElementById('e-schwab').value = d.schwab;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  LIVE CALCULATIONS
+// ─────────────────────────────────────────────────────────────────────
+function recalc() {
+  const c = clients.find(x => x.id === currentClientId);
+  if (!c) return;
+
+  const inflow = c.inflow;
+  const outflow = c.outflow;
+  const excess = inflow - outflow;
+  const target = outflow * c.reserveTarget;
+
+  document.getElementById('calc-inflow').textContent = fmt(inflow);
+  document.getElementById('calc-outflow').textContent = fmt(outflow);
+  document.getElementById('calc-excess').textContent = fmt(excess);
+  document.getElementById('calc-excess').className = 'calc-value ' + (excess >= 0 ? 'positive' : 'negative');
+  document.getElementById('calc-target').textContent = fmt(target);
+
+  let ret1 = 0, ret2 = 0, nonret = 0, trust = 0, liab = 0;
+  c.accounts.retirement_c1.forEach((_,i) => { const v=num(`ret1-${i}`); ret1+=v; });
+  c.accounts.retirement_c2.forEach((_,i) => { const v=num(`ret2-${i}`); ret2+=v; });
+  c.accounts.nonRetirement.forEach((_,i) => { const v=num(`nonret-${i}`); nonret+=v; });
+  trust = num('trust-val');
+  c.accounts.liabilities.forEach((_,i) => { liab+=num(`liab-${i}`); });
+
+  const grand = ret1 + ret2 + nonret + trust;
+
+  document.getElementById('calc-ret1').textContent = fmt(ret1);
+  document.getElementById('calc-ret2').textContent = fmt(ret2);
+  document.getElementById('calc-nonret').textContent = fmt(nonret);
+  document.getElementById('calc-trust').textContent = fmt(trust);
+  document.getElementById('calc-grand').textContent = fmt(grand);
+  document.getElementById('calc-liab').textContent = fmt(liab);
+
+  // Progress
+  const totalFields = 2 + c.accounts.retirement_c1.length + c.accounts.retirement_c2.length +
+    c.accounts.nonRetirement.length + 1 + c.accounts.liabilities.length;
+  let filled = 0;
+  if(num('e-reserve')) filled++;
+  if(num('e-schwab')) filled++;
+  c.accounts.retirement_c1.forEach((_,i) => { if(num(`ret1-${i}`)) filled++; });
+  c.accounts.retirement_c2.forEach((_,i) => { if(num(`ret2-${i}`)) filled++; });
+  c.accounts.nonRetirement.forEach((_,i) => { if(num(`nonret-${i}`)) filled++; });
+  if(num('trust-val')) filled++;
+  c.accounts.liabilities.forEach((_,i) => { if(num(`liab-${i}`)) filled++; });
+
+  const pct = Math.round((filled/totalFields)*100);
+  document.getElementById('entry-progress-fill').style.width = pct + '%';
+  document.getElementById('entry-progress-label').textContent = `${filled} of ${totalFields} fields entered`;
+
+  // Store for report
+  currentReport = { inflow, outflow, excess, target, ret1, ret2, nonret, trust, liab, grand,
+    reserve: num('e-reserve'), schwab: num('e-schwab') };
+}
+
+function num(id) { const el = document.getElementById(id); return el ? (parseFloat(el.value)||0) : 0; }
+
+// ─────────────────────────────────────────────────────────────────────
+//  REPORT GENERATION
+// ─────────────────────────────────────────────────────────────────────
+function generateReports() {
+  recalc();
+  const c = clients.find(x => x.id === currentClientId);
+  const name = c.c2 ? `${c.c1.first} & ${c.c2.first} ${c.c1.last}` : `${c.c1.first} ${c.c1.last}`;
+  document.getElementById('report-subtitle').textContent = `${name} · Q2 2026`;
+
+  showScreen('report');
+  viewReport('sacs');
+
+  // Add to history
+  reportHistory.unshift({ client: `${c.c1.last} Family`, type: 'SACS + TCC', quarter: 'Q2 2026', date: 'Today' });
+  c.lastReport = 'Jun 2026';
+  toast('✅', 'Reports generated successfully!');
+}
+
+function viewReport(type) {
+  currentReportView = type;
+  document.querySelectorAll('#screen-report .btn-primary, #screen-report .btn-outline').forEach(b => {
+    b.className = b.textContent.toLowerCase().includes(type) ? 'btn btn-primary' : 'btn btn-outline';
+  });
+
+  const c = clients.find(x => x.id === currentClientId);
+  const name = c.c2 ? `${c.c1.first} & ${c.c2.first} ${c.c1.last}` : `${c.c1.first} ${c.c1.last}`;
+  const r = currentReport;
+  const el = document.getElementById('report-display');
+
+  if (type === 'sacs') {
+    el.innerHTML = `
+    <div class="report-preview-container">
+      <div class="report-page">
+        <div class="report-header">
+          <div>
+            <div class="report-header-logo"><span>W</span>indbrook Solutions</div>
+            <div class="report-header-title">Simple Automated Cash Flow System</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="report-header-client">${name}</div>
+            <div class="report-header-date">Q2 2026 — June 2026</div>
+          </div>
+        </div>
+        <div class="sacs-body">
+          <div class="sacs-title">Monthly Cash Flow Overview</div>
+          <div class="sacs-diagram">
+
+            <!-- INFLOW -->
+            <div class="bubble bubble-inflow">
+              <div class="bubble-label">Inflow</div>
+              <div class="bubble-amount">${fmt(r.inflow)}</div>
+              <div class="bubble-sub">monthly take-home</div>
+            </div>
+
+            <!-- ARROW DOWN -->
+            <div class="sacs-arrow">
+              <div class="sacs-arrow-line green"></div>
+              <div style="color:var(--green); font-size:12px;">▼</div>
+            </div>
+
+            <!-- OUTFLOW -->
+            <div class="bubble bubble-outflow">
+              <div class="bubble-label">Outflow</div>
+              <div class="bubble-amount">${fmt(r.outflow)}</div>
+              <div class="bubble-sub">expense budget</div>
+            </div>
+
+            <!-- ARROW DOWN -->
+            <div class="sacs-arrow">
+              <div class="sacs-arrow-line navy"></div>
+              <div style="color:var(--navy); font-size:12px;">▼</div>
+              <div class="sacs-arrow-label">${fmt(r.excess)}/mo excess</div>
+            </div>
+
+            <!-- PRIVATE RESERVE -->
+            <div class="bubble bubble-reserve">
+              <div class="bubble-label">Private Reserve</div>
+              <div class="bubble-amount">${fmt(r.reserve)}</div>
+              <div class="bubble-sub">target: ${fmt(r.target)}</div>
+            </div>
+          </div>
+
+          <div class="sacs-summary">
+            <div class="sacs-summary-title">Investment Summary</div>
+            <div class="calc-row">
+              <span class="calc-label">Schwab Investment Account</span>
+              <span class="calc-value">${fmt(r.schwab)}</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Private Reserve Balance</span>
+              <span class="calc-value">${fmt(r.reserve)}</span>
+            </div>
+            <div class="calc-row" style="border-bottom:none;">
+              <span class="calc-label">Reserve vs. Target</span>
+              <span class="calc-value ${r.reserve >= r.target ? 'positive' : 'negative'}">${r.reserve >= r.target ? '✓ Fully Funded' : fmt(r.reserve - r.target) + ' below target'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="color:rgba(255,255,255,0.6); font-size:13px; max-width:180px; padding-top:8px;">
+        <div style="font-weight:600; color:white; margin-bottom:8px;">SACS Report</div>
+        <div style="line-height:1.6;">Shows monthly cash flow from inflow through outflow to private reserve accumulation.</div>
+        <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+          <button class="btn btn-gold btn-sm" onclick="printReport('sacs')" style="width:100%;">🖨 Print PDF</button>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    // TCC
+    const accts = c.accounts;
+    const r1Accts = accts.retirement_c1.map((a,i) => ({...a, balance: num(`ret1-${i}`)}));
+    const r2Accts = accts.retirement_c2.map((a,i) => ({...a, balance: num(`ret2-${i}`)}));
+    const nrActs = accts.nonRetirement.map((a,i) => ({...a, balance: num(`nonret-${i}`)}));
+    const liabs = accts.liabilities.map((l,i) => ({...l, balance: num(`liab-${i}`)}));
+
+    el.innerHTML = `
+    <div class="report-preview-container">
+      <div class="report-page" style="width:580px;">
+        <div class="report-header">
+          <div>
+            <div class="report-header-logo"><span>W</span>indbrook Solutions</div>
+            <div class="report-header-title">Total Client Chart — Net Worth Overview</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="report-header-client">${name}</div>
+            <div class="report-header-date">Q2 2026 — June 2026</div>
+          </div>
+        </div>
+        <div class="tcc-body">
+          <div class="tcc-title">Account Summary by Type</div>
+
+          <!-- Client info bubbles -->
+          <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+            <div class="acct-bubble" style="background:var(--green); flex:1;">
+              <div class="acct-type">Client 1</div>
+              <div style="font-size:14px; font-weight:600; margin-top:2px;">${c.c1.first} ${c.c1.last}</div>
+              <div class="acct-num">DOB: ${formatDate(c.c1.dob)} · SSN: ***${c.c1.ssn}</div>
+            </div>
+            ${c.c2 ? `<div class="acct-bubble" style="background:var(--green); flex:1;">
+              <div class="acct-type">Client 2</div>
+              <div style="font-size:14px; font-weight:600; margin-top:2px;">${c.c2.first} ${c.c2.last}</div>
+              <div class="acct-num">DOB: ${formatDate(c.c2.dob)} · SSN: ***${c.c2.ssn}</div>
+            </div>` : ''}
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+            <!-- Retirement C1 -->
+            <div>
+              <div class="tcc-section-label">🏦 ${c.c1.first}'s Retirement</div>
+              ${r1Accts.map(a => `<div class="acct-bubble">
+                <div class="acct-type">${a.type}</div>
+                <div class="acct-balance">${fmt(a.balance)}</div>
+                <div class="acct-num">···${a.num}</div>
+              </div>`).join('')}
+              <div class="total-box">
+                <div class="total-label">Retirement Total</div>
+                <div class="total-amount">${fmt(r.ret1)}</div>
+              </div>
+            </div>
+
+            <!-- Retirement C2 -->
+            ${c.c2 ? `<div>
+              <div class="tcc-section-label">🏦 ${c.c2.first}'s Retirement</div>
+              ${r2Accts.map(a => `<div class="acct-bubble">
+                <div class="acct-type">${a.type}</div>
+                <div class="acct-balance">${fmt(a.balance)}</div>
+                <div class="acct-num">···${a.num}</div>
+              </div>`).join('')}
+              <div class="total-box">
+                <div class="total-label">Retirement Total</div>
+                <div class="total-amount">${fmt(r.ret2)}</div>
+              </div>
+            </div>` : '<div></div>'}
+          </div>
+
+          <!-- Non-Retirement -->
+          <div style="margin-bottom:12px;">
+            <div class="tcc-section-label">📈 Non-Retirement Accounts</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              ${nrActs.map(a => `<div class="acct-bubble" style="flex:1; min-width:120px; background:var(--navy-mid);">
+                <div class="acct-type">${a.type}</div>
+                <div class="acct-balance">${fmt(a.balance)}</div>
+                <div class="acct-num">···${a.num}</div>
+              </div>`).join('')}
+              <div class="total-box" style="flex:1; min-width:120px;">
+                <div class="total-label">Non-Retirement Total</div>
+                <div class="total-amount">${fmt(r.nonret)}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust -->
+          <div style="margin-bottom:12px;">
+            <div class="tcc-section-label">🏠 Trust / Property</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div class="acct-bubble" style="flex:1; background:var(--navy-mid);">
+                <div class="acct-type">Primary Residence</div>
+                <div class="acct-balance">${fmt(r.trust)}</div>
+                <div class="acct-num">${accts.trust.address}</div>
+              </div>
+              <div class="total-box" style="flex:1;">
+                <div class="total-label">Trust Value</div>
+                <div class="total-amount">${fmt(r.trust)}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grand Total -->
+          <div class="grand-total-bar" style="margin-bottom:12px;">
+            <div>
+              <div class="label">Grand Total Net Worth</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px;">Retirement + Non-Retirement + Trust</div>
+            </div>
+            <div class="amount">${fmt(r.grand)}</div>
+          </div>
+
+          <!-- Liabilities -->
+          <div class="tcc-liabilities">
+            <div class="tcc-section-label" style="color:var(--red); margin-bottom:8px;">📉 Liabilities (Not Subtracted from Net Worth)</div>
+            ${liabs.map(l => `<div class="liability-row">
+              <span class="liability-label">${l.type} @ ${l.rate}</span>
+              <span class="liability-amount">${fmt(l.balance)}</span>
+            </div>`).join('')}
+            <div style="border-top:1px solid var(--red); margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; font-weight:600; font-size:13px;">
+              <span style="color:var(--gray-600);">Total Liabilities</span>
+              <span style="color:var(--red);">${fmt(r.liab)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="color:rgba(255,255,255,0.6); font-size:13px; max-width:180px; padding-top:8px;">
+        <div style="font-weight:600; color:white; margin-bottom:8px;">TCC Report</div>
+        <div style="line-height:1.6;">Shows total net worth organized by account type. Liabilities are shown separately and not subtracted.</div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-gold btn-sm" onclick="printReport('tcc')" style="width:100%;">🖨 Print PDF</button>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+function printReport(type) {
+  toast('🖨', `Opening ${type.toUpperCase()} for print…`);
+  setTimeout(() => window.print(), 300);
+}
+
+function downloadBoth() {
+  toast('⬇', 'Both PDFs ready — use browser print to save as PDF');
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  HISTORY SCREEN
+// ─────────────────────────────────────────────────────────────────────
+function renderHistory() {
+  document.getElementById('history-tbody').innerHTML = reportHistory.map(r => `
+    <tr>
+      <td><strong>${r.client}</strong></td>
+      <td>${r.type}</td>
+      <td><span class="badge badge-gold">${r.quarter}</span></td>
+      <td>${r.date}</td>
+      <td><button class="btn btn-outline btn-sm">⬇ Download</button></td>
+    </tr>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  ADD CLIENT MODAL
+// ─────────────────────────────────────────────────────────────────────
+function openAddClientModal() {
+  document.getElementById('add-client-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('add-client-modal').classList.remove('open');
+}
+function saveNewClient() {
+  const f = (id) => document.getElementById(id).value.trim();
+  const c1First = f('new-c1-first'), c1Last = f('new-c1-last');
+  if (!c1First || !c1Last) { toast('⚠️', 'Please enter at least Client 1\'s name'); return; }
+  const newClient = {
+    id: clients.length + 1,
+    c1: { first: c1First, last: c1Last, dob: '1970-01-01', ssn: f('new-c1-ssn') || '0000' },
+    c2: f('new-c2-first') ? { first: f('new-c2-first'), last: f('new-c2-last') || c1Last, dob: '1970-01-01', ssn: f('new-c2-ssn') || '0000' } : null,
+    inflow: parseInt(f('new-inflow')) || 0,
+    outflow: parseInt(f('new-outflow')) || 0,
+    reserveTarget: 6,
+    lastReport: 'None',
+    accounts: { retirement_c1: [], retirement_c2: [], nonRetirement: [], trust: { address: 'TBD', balance: null }, liabilities: [] }
+  };
+  clients.push(newClient);
+  closeModal();
+  renderClients();
+  toast('✅', `${c1First} ${c1Last} added successfully!`);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  return '$' + Math.round(n).toLocaleString();
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function toast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────────────────
+renderClients();
+</script>
+</body>
+</html>
